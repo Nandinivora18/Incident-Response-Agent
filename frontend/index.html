@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incident Response Agent</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🚨</span>
+                    <h1>Incident Response Agent</h1>
+                    <p class="subtitle">AI-Powered Incident Investigation & Learning System</p>
+                </div>
+                <div class="header-status">
+                    <div id="status" class="status-indicator">
+                        <span class="status-dot"></span>
+                        <span>System Status: <span id="system-status">Checking...</span></span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Tabs Navigation -->
+            <nav class="tabs-nav">
+                <button class="tab-btn active" data-tab="investigate">🔍 Investigate</button>
+                <button class="tab-btn" data-tab="knowledge">📚 Knowledge Base</button>
+                <button class="tab-btn" data-tab="statistics">📊 Statistics</button>
+                <button class="tab-btn" data-tab="history">📋 History</button>
+            </nav>
+
+            <!-- Tab Contents -->
+            
+            <!-- Investigate Tab -->
+            <section id="investigate" class="tab-content active">
+                <div class="section-header">
+                    <h2>🔍 Investigate Incident</h2>
+                    <p>Submit an incident for automated investigation and root cause analysis</p>
+                </div>
+
+                <form id="investigateForm" class="form-grid">
+                    <div class="form-group">
+                        <label for="title">Incident Title *</label>
+                        <input type="text" id="title" name="title" placeholder="e.g., High CPU Usage on Database" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="severity">Severity *</label>
+                        <select id="severity" name="severity" required>
+                            <option value="">Select severity...</option>
+                            <option value="critical">🔴 Critical</option>
+                            <option value="high">🟠 High</option>
+                            <option value="medium">🟡 Medium</option>
+                            <option value="low">🟢 Low</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="service">Service *</label>
+                        <input type="text" id="service" name="service" placeholder="e.g., api-gateway" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="affected">Affected Services</label>
+                        <input type="text" id="affected" name="affected" placeholder="Comma-separated: service1,service2">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="description">Description *</label>
+                        <textarea id="description" name="description" placeholder="Describe the incident..." required></textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="logs">Logs (JSON)</label>
+                        <textarea id="logs" name="logs" placeholder='["error message 1", "error message 2"]'></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">▶️ Start Investigation</button>
+                </form>
+
+                <!-- Investigation Results -->
+                <div id="investigationResults" class="results-container" style="display: none;">
+                    <div class="section-header">
+                        <h3>Investigation Results</h3>
+                    </div>
+                    
+                    <div class="result-card">
+                        <div class="result-status">
+                            <span id="resultStatus"></span>
+                            <span id="resultTime" class="result-time"></span>
+                        </div>
+
+                        <div class="result-grid">
+                            <div class="result-item">
+                                <h4>Root Cause</h4>
+                                <p id="resultRootCause" class="result-value"></p>
+                                <div class="confidence-bar">
+                                    <div id="confidenceBar" class="confidence-fill"></div>
+                                </div>
+                                <small id="confidenceText"></small>
+                            </div>
+
+                            <div class="result-item">
+                                <h4>Immediate Action</h4>
+                                <p id="resultAction" class="result-value"></p>
+                            </div>
+
+                            <div class="result-item">
+                                <h4>Estimated MTTR</h4>
+                                <p id="resultMTTR" class="result-value"></p>
+                            </div>
+                        </div>
+
+                        <div class="remediation-plan">
+                            <h4>📋 Remediation Plan</h4>
+                            <div id="remediationSteps"></div>
+                        </div>
+
+                        <div class="similar-incidents">
+                            <h4>🔄 Similar Past Incidents</h4>
+                            <div id="similarList"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Knowledge Base Tab -->
+            <section id="knowledge" class="tab-content">
+                <div class="section-header">
+                    <h2>📚 Knowledge Base</h2>
+                    <p>View stored incidents, root causes, and solutions</p>
+                </div>
+
+                <div class="kb-grid">
+                    <div class="kb-section">
+                        <h3>Recent Incidents</h3>
+                        <div id="incidentsList" class="kb-list">Loading...</div>
+                    </div>
+
+                    <div class="kb-section">
+                        <h3>Common Root Causes</h3>
+                        <div id="rootCausesList" class="kb-list">Loading...</div>
+                    </div>
+
+                    <div class="kb-section">
+                        <h3>Solutions Repository</h3>
+                        <div id="solutionsList" class="kb-list">Loading...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Statistics Tab -->
+            <section id="statistics" class="tab-content">
+                <div class="section-header">
+                    <h2>📊 Statistics</h2>
+                    <p>System performance and knowledge base metrics</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📈</div>
+                        <h4>Total Incidents</h4>
+                        <p id="statTotalIncidents" class="stat-value">-</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">🎯</div>
+                        <h4>Root Causes Found</h4>
+                        <p id="statRootCauses" class="stat-value">-</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">💡</div>
+                        <h4>Solutions Available</h4>
+                        <p id="statSolutions" class="stat-value">-</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">⏱️</div>
+                        <h4>Avg MTTR</h4>
+                        <p id="statMTTR" class="stat-value">-</p>
+                    </div>
+                </div>
+
+                <div class="severity-breakdown">
+                    <h3>Incidents by Severity</h3>
+                    <div id="severityChart" class="chart"></div>
+                </div>
+
+                <div class="service-breakdown">
+                    <h3>Incidents by Service</h3>
+                    <div id="serviceChart" class="chart"></div>
+                </div>
+            </section>
+
+            <!-- History Tab -->
+            <section id="history" class="tab-content">
+                <div class="section-header">
+                    <h2>📋 Investigation History</h2>
+                    <p>Timeline of all investigations with results</p>
+                </div>
+
+                <div id="historyTimeline" class="timeline">Loading...</div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Incident Response Agent v1.0.0 | Apache 2.0 License</p>
+            <p>Merging Aurora & IncidentFox for intelligent incident management</p>
+        </footer>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-spinner hidden">
+        <div class="spinner"></div>
+        <p>Investigating...</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

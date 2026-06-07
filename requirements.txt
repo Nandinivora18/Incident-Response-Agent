@@ -1,0 +1,67 @@
+## Core Dependencies
+langchain==0.1.20
+langgraph==0.0.40
+python-dotenv==1.0.0
+pydantic==2.5.0
+httpx==0.25.0
+
+## LLM Providers
+openai==1.3.0
+anthropic==0.7.0
+
+## Data & Storage
+pydantic-settings==2.1.0
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.9
+pymongo==4.6.0
+redis==5.0.1
+
+## Infrastructure & Cloud
+boto3==1.29.7
+azure-identity==1.14.0
+azure-monitor==1.0.0
+kubernetes==28.0.0
+requests==2.31.0
+
+## Chat Integrations
+slack-sdk==3.26.0
+slack-bolt==1.18.0
+microsoft-teams-cli==0.1.0
+
+## Monitoring & Observability
+prometheus-client==0.19.0
+datadog==0.47.0
+elastic-transport==8.11.0
+splunk-sdk==1.7.4
+
+## Utilities
+loguru==0.7.2
+typer==0.9.0
+click==8.1.7
+tabulate==0.9.0
+pyyaml==6.0.1
+jsonschema==4.20.0
+
+## Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+pytest-mock==3.12.0
+
+## Development
+black==23.12.0
+flake8==6.1.0
+mypy==1.7.0
+pre-commit==3.6.0
+
+## Web UI (Required)
+fastapi==0.109.0
+uvicorn==0.27.0
+pydantic-settings==2.1.0
+
+## Optional: Advanced AI
+transformers==4.35.0
+sentence-transformers==2.2.2
+scikit-learn==1.3.2
+numpy==1.24.3
+pandas==2.1.1
