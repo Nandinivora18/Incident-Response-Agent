@@ -67,10 +67,16 @@ class KnowledgeManager:
             
             # Store solution
             if investigation.get("solution"):
+                solution_obj = investigation["solution"]
+                effectiveness = (
+                    solution_obj.get("effectiveness_score", 0.8)
+                    if isinstance(solution_obj, dict)
+                    else 0.8
+                )
                 self._store_solution(
                     investigation.get("root_cause", "Unknown"),
-                    investigation["solution"],
-                    investigation.get("effectiveness_score", 0.8),
+                    solution_obj,
+                    effectiveness,
                     new_incident["id"]
                 )
             
@@ -82,32 +88,53 @@ class KnowledgeManager:
             raise
     
     def find_similar_incidents(self, incident: Dict[str, Any], 
-                               similarity_threshold: float = 0.7) -> List[Dict[str, Any]]:
-        """Find similar past incidents using keyword matching."""
+                               similarity_threshold: float = 0.6) -> List[Dict[str, Any]]:
+        """Find similar past incidents using keyword, description, and metrics matching."""
         try:
             incidents = self._load_json(self.incidents_file)
             
             current_title = incident.get("title", "").lower()
+            current_desc = incident.get("description", "").lower()
             current_service = incident.get("service", "").lower()
             current_tags = set(self._extract_tags(incident))
+            current_metrics = incident.get("metrics") or {}
             
             similar = []
             
             for past_incident in incidents:
                 past_title = past_incident.get("incident", {}).get("title", "").lower()
+                past_desc = past_incident.get("incident", {}).get("description", "").lower()
                 past_service = past_incident.get("incident", {}).get("service", "").lower()
                 past_tags = set(past_incident.get("tags", []))
+                past_metrics = past_incident.get("incident", {}).get("metrics") or {}
                 
                 # Calculate similarity scores
                 title_similarity = self._string_similarity(current_title, past_title)
-                service_match = 1.0 if current_service == past_service else 0.3
+                desc_similarity = self._string_similarity(current_desc, past_desc)
+                service_match = 1.0 if current_service == past_service else 0.2
                 tag_overlap = len(current_tags & past_tags) / max(len(current_tags | past_tags), 1)
+                
+                # Metric overlap logic
+                curr_cpu_high = current_metrics.get("cpu_usage", 0) > 80
+                past_cpu_high = past_metrics.get("cpu_usage", 0) > 80
+                curr_mem_high = current_metrics.get("memory_usage", 0) > 80
+                past_mem_high = past_metrics.get("memory_usage", 0) > 80
+                curr_conn_high = current_metrics.get("connections", 0) > 400
+                past_conn_high = past_metrics.get("connections", 0) > 400
+                
+                metric_match = 1.0 if (
+                    curr_cpu_high == past_cpu_high and 
+                    curr_mem_high == past_mem_high and 
+                    curr_conn_high == past_conn_high
+                ) else 0.5
                 
                 # Weighted average
                 overall_similarity = (
-                    title_similarity * 0.4 +
-                    service_match * 0.3 +
-                    tag_overlap * 0.3
+                    title_similarity * 0.3 +
+                    desc_similarity * 0.2 +
+                    service_match * 0.2 +
+                    tag_overlap * 0.15 +
+                    metric_match * 0.15
                 )
                 
                 if overall_similarity >= similarity_threshold:
@@ -169,6 +196,8 @@ class KnowledgeManager:
             services = {}
             total_mttr = 0
             count_with_mttr = 0
+            total_time_saved = 0.0
+            reused_count = 0
             
             for incident in incidents:
                 severity = incident.get("severity", "unknown")
@@ -178,17 +207,31 @@ class KnowledgeManager:
                 services[service] = services.get(service, 0) + 1
                 
                 mttr = incident.get("mttr_minutes")
-                if mttr:
+                if mttr is not None:
                     total_mttr += mttr
                     count_with_mttr += 1
+                
+                # Check if learning was applied
+                learning = incident.get("investigation", {}).get("learning_applied", [])
+                has_learning = False
+                if learning and len(learning) > 0 and "No previous similar" not in learning[0]:
+                    has_learning = True
+                
+                if has_learning:
+                    reused_count += 1
+                    saved = max(0.0, 35.0 - (mttr or 0.0))
+                    total_time_saved += saved
             
             avg_mttr = total_mttr / count_with_mttr if count_with_mttr > 0 else 0
+            reuse_rate = reused_count / len(incidents) if len(incidents) > 0 else 0.0
             
             stats = {
                 "total_incidents": len(incidents),
                 "total_root_causes": len(root_causes),
                 "total_solutions": len(solutions),
                 "average_mttr_minutes": round(avg_mttr, 2),
+                "total_time_saved_minutes": round(total_time_saved, 1),
+                "knowledge_reuse_rate": round(reuse_rate, 2),
                 "incidents_by_severity": severities,
                 "incidents_by_service": services,
                 "most_common_root_causes": [

@@ -140,7 +140,16 @@ class LogAgent(BaseAgent):
         """Analyze logs for patterns."""
         logger.info("Running log analysis")
         
-        logs = incident.get("logs", [])
+        raw_logs = incident.get("logs", [])
+        # Normalize logs: handle lists, dicts, strings — ensure each item is a plain string
+        if isinstance(raw_logs, list):
+            logs = [str(item) for item in raw_logs]
+        elif isinstance(raw_logs, dict):
+            logs = [f"{k}: {v}" for k, v in raw_logs.items()]
+        elif isinstance(raw_logs, str):
+            logs = [raw_logs]
+        else:
+            logs = [str(raw_logs)] if raw_logs else []
         
         error_patterns = {
             "slow_queries": sum(1 for log in logs if "slow query" in log.lower()),

@@ -82,7 +82,7 @@ async def run_demo_investigation():
     print("\n" + "="*80)
     print("INCIDENT RESPONSE AGENT - DEMO INVESTIGATION")
     print("="*80)
-    print(f"\n📋 Incident: {sample_incident['title']}")
+    print(f"\nIncident: {sample_incident['title']}")
     print(f"Severity: {sample_incident['severity']}")
     print(f"Service: {sample_incident['service']}")
     
@@ -98,7 +98,7 @@ async def run_demo_investigation():
     logger.info("Storing investigation results in knowledge base...")
     knowledge_manager.store_incident(sample_incident, investigation_result)
     
-    print("\n✅ Investigation complete and stored in knowledge base!")
+    print("\n[SUCCESS] Investigation complete and stored in knowledge base!")
     print("="*80 + "\n")
 
 

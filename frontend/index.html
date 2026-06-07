@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Incident Response Agent</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,8 +15,10 @@
             <div class="header-content">
                 <div class="logo">
                     <span class="logo-icon">🚨</span>
-                    <h1>Incident Response Agent</h1>
-                    <p class="subtitle">AI-Powered Incident Investigation & Learning System</p>
+                    <div class="logo-text">
+                        <h1>Incident Response Agent</h1>
+                        <p class="subtitle">AI-Powered Incident Investigation & Learning System</p>
+                    </div>
                 </div>
                 <div class="header-status">
                     <div id="status" class="status-indicator">
@@ -41,53 +45,113 @@
             <section id="investigate" class="tab-content active">
                 <div class="section-header">
                     <h2>🔍 Investigate Incident</h2>
-                    <p>Submit an incident for automated investigation and root cause analysis</p>
+                    <p>Submit an incident for automated investigation, root cause analysis, and historical solution retrieval</p>
                 </div>
 
-                <form id="investigateForm" class="form-grid">
-                    <div class="form-group">
-                        <label for="title">Incident Title *</label>
-                        <input type="text" id="title" name="title" placeholder="e.g., High CPU Usage on Database" required>
-                    </div>
+                <div class="dashboard-split">
+                    <!-- Form side -->
+                    <form id="investigateForm" class="form-grid">
+                        <div class="form-group">
+                            <label for="title">Incident Title *</label>
+                            <input type="text" id="title" name="title" placeholder="e.g., High CPU Usage on Database" required>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="severity">Severity *</label>
-                        <select id="severity" name="severity" required>
-                            <option value="">Select severity...</option>
-                            <option value="critical">🔴 Critical</option>
-                            <option value="high">🟠 High</option>
-                            <option value="medium">🟡 Medium</option>
-                            <option value="low">🟢 Low</option>
-                        </select>
-                    </div>
+                        <div class="form-group">
+                            <label for="severity">Severity *</label>
+                            <select id="severity" name="severity" required>
+                                <option value="">Select severity...</option>
+                                <option value="critical">🔴 Critical</option>
+                                <option value="high">🟠 High</option>
+                                <option value="medium">🟡 Medium</option>
+                                <option value="low">🟢 Low</option>
+                            </select>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="service">Service *</label>
-                        <input type="text" id="service" name="service" placeholder="e.g., api-gateway" required>
-                    </div>
+                        <div class="form-group">
+                            <label for="service">Service *</label>
+                            <input type="text" id="service" name="service" placeholder="e.g., main-db" required>
+                        </div>
 
-                    <div class="form-group">
-                        <label for="affected">Affected Services</label>
-                        <input type="text" id="affected" name="affected" placeholder="Comma-separated: service1,service2">
-                    </div>
+                        <div class="form-group">
+                            <label for="affected">Affected Services</label>
+                            <input type="text" id="affected" name="affected" placeholder="Comma-separated: service1,service2">
+                        </div>
 
-                    <div class="form-group full-width">
-                        <label for="description">Description *</label>
-                        <textarea id="description" name="description" placeholder="Describe the incident..." required></textarea>
-                    </div>
+                        <div class="form-group full-width">
+                            <label for="description">Description *</label>
+                            <textarea id="description" name="description" placeholder="Describe the symptoms of the incident..." required></textarea>
+                        </div>
 
-                    <div class="form-group full-width">
-                        <label for="logs">Logs (JSON)</label>
-                        <textarea id="logs" name="logs" placeholder='["error message 1", "error message 2"]'></textarea>
-                    </div>
+                        <div class="form-group full-width">
+                            <label for="logs">Logs (JSON Array of Strings - Optional)</label>
+                            <textarea id="logs" name="logs" placeholder='["Slow query detected", "Connection pool near capacity"]'></textarea>
+                        </div>
 
-                    <button type="submit" class="btn btn-primary">▶️ Start Investigation</button>
-                </form>
+                        <button type="submit" class="btn btn-primary">▶️ Start Agent Investigation</button>
+                    </form>
+
+                    <!-- Investigation Progress Timeline (Visible when running) -->
+                    <div id="investigationProgress" class="progress-card" style="display: none;">
+                        <h3>🔬 Agent Collaboration Workflow</h3>
+                        <p class="progress-subtitle">Specialized agents are cooperating to analyze metrics, logs, and trace root cause:</p>
+                        <div class="progress-timeline">
+                            <div class="progress-step" id="step-knowledge_retrieval">
+                                <span class="step-icon">📚</span>
+                                <div class="step-info">
+                                    <h5>Historical Learning Retrieval</h5>
+                                    <p>Querying memory for similar past issues...</p>
+                                </div>
+                            </div>
+                            <div class="progress-step" id="step-initial_assessment">
+                                <span class="step-icon">📋</span>
+                                <div class="step-info">
+                                    <h5>Initial Scope Assessment</h5>
+                                    <p>Determining severity, services impacted, and urgency...</p>
+                                </div>
+                            </div>
+                            <div class="progress-step" id="step-deep_investigation">
+                                <span class="step-icon">🔍</span>
+                                <div class="step-info">
+                                    <h5>Deep Agent Investigation</h5>
+                                    <p>Concurrently running Metrics, Log, K8s, Cloud & Code Agents...</p>
+                                </div>
+                            </div>
+                            <div class="progress-step" id="step-root_cause_analysis">
+                                <span class="step-icon">🎯</span>
+                                <div class="step-info">
+                                    <h5>Root Cause Determination</h5>
+                                    <p>Synthesizing evidence and weighing options...</p>
+                                </div>
+                            </div>
+                            <div class="progress-step" id="step-solution_generation">
+                                <span class="step-icon">💡</span>
+                                <div class="step-info">
+                                    <h5>Remediation Solution Generation</h5>
+                                    <p>Retrieving optimal quick fixes and preventions...</p>
+                                </div>
+                            </div>
+                            <div class="progress-step" id="step-remediation">
+                                <span class="step-icon">📋</span>
+                                <div class="step-info">
+                                    <h5>Remediation Planning</h5>
+                                    <p>Building step-by-step resolution plan...</p>
+                                </div>
+                            </div>
+                            <div class="progress-step" id="step-learning">
+                                <span class="step-icon">💾</span>
+                                <div class="step-info">
+                                    <h5>Storing Knowledge Base learning</h5>
+                                    <p>Writing findings to database to optimize future runs...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Investigation Results -->
                 <div id="investigationResults" class="results-container" style="display: none;">
                     <div class="section-header">
-                        <h3>Investigation Results</h3>
+                        <h3>📋 Investigation Report</h3>
                     </div>
                     
                     <div class="result-card">
@@ -98,7 +162,7 @@
 
                         <div class="result-grid">
                             <div class="result-item">
-                                <h4>Root Cause</h4>
+                                <h4>🎯 Root Cause</h4>
                                 <p id="resultRootCause" class="result-value"></p>
                                 <div class="confidence-bar">
                                     <div id="confidenceBar" class="confidence-fill"></div>
@@ -107,24 +171,37 @@
                             </div>
 
                             <div class="result-item">
-                                <h4>Immediate Action</h4>
+                                <h4>💡 Immediate Action</h4>
                                 <p id="resultAction" class="result-value"></p>
                             </div>
 
                             <div class="result-item">
-                                <h4>Estimated MTTR</h4>
+                                <h4>⏱️ Resolution Time (MTTR)</h4>
                                 <p id="resultMTTR" class="result-value"></p>
+                            </div>
+
+                            <div class="result-item">
+                                <h4>🔄 Historical Re-use</h4>
+                                <p id="resultLearning" class="result-value"></p>
+                                <span id="timeSavedBadge" class="badge-success"></span>
                             </div>
                         </div>
 
                         <div class="remediation-plan">
-                            <h4>📋 Remediation Plan</h4>
-                            <div id="remediationSteps"></div>
+                            <h4>📋 Step-by-Step Remediation Plan</h4>
+                            <div id="remediationSteps" class="steps-grid"></div>
                         </div>
 
                         <div class="similar-incidents">
-                            <h4>🔄 Similar Past Incidents</h4>
-                            <div id="similarList"></div>
+                            <h4>🔄 Similar Past Incidents Matched</h4>
+                            <div id="similarList" class="similar-grid"></div>
+                        </div>
+
+                        <div class="git-patch-section" id="gitPatchCard" style="display: none; margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 24px;">
+                            <h4>🛠️ Auto-Generated Remediation Git Patch</h4>
+                            <p class="patch-desc" style="opacity: 0.8; margin-bottom: 12px; font-size: 14px;">The CodeAnalysisAgent detected a configuration or code regression. Here is the proposed Git fix:</p>
+                            <pre class="git-diff-block" style="background: rgba(0,0,0,0.5); border-radius: 8px; padding: 16px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #a9b7c6; border: 1px solid rgba(255,255,255,0.05);"><code id="gitDiffContent" style="white-space: pre;"></code></pre>
+                            <button class="btn btn-success" id="btnCreatePR" style="margin-top: 12px; background: #10b981; border: none; padding: 10px 20px; font-weight: 600; border-radius: 6px; cursor: pointer; color: white;">🚀 Create Git Pull Request</button>
                         </div>
                     </div>
                 </div>
@@ -134,7 +211,7 @@
             <section id="knowledge" class="tab-content">
                 <div class="section-header">
                     <h2>📚 Knowledge Base</h2>
-                    <p>View stored incidents, root causes, and solutions</p>
+                    <p>Access stored incident archives, root causes, and resolution patterns</p>
                 </div>
 
                 <div class="kb-grid">
@@ -158,8 +235,8 @@
             <!-- Statistics Tab -->
             <section id="statistics" class="tab-content">
                 <div class="section-header">
-                    <h2>📊 Statistics</h2>
-                    <p>System performance and knowledge base metrics</p>
+                    <h2>📊 System Metrics & Historical Performance</h2>
+                    <p>Observe how cumulative experience improves incident response metrics over time</p>
                 </div>
 
                 <div class="stats-grid">
@@ -186,24 +263,47 @@
                         <h4>Avg MTTR</h4>
                         <p id="statMTTR" class="stat-value">-</p>
                     </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">⚡</div>
+                        <h4>Total Time Saved</h4>
+                        <p id="statTimeSaved" class="stat-value">-</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">🔄</div>
+                        <h4>Knowledge Reuse Rate</h4>
+                        <p id="statReuseRate" class="stat-value">-</p>
+                    </div>
                 </div>
 
-                <div class="severity-breakdown">
-                    <h3>Incidents by Severity</h3>
-                    <div id="severityChart" class="chart"></div>
-                </div>
+                <div class="charts-layout">
+                    <!-- SVG Chart -->
+                    <div class="chart-box main-chart-box">
+                        <h3>📈 MTTR Learning Curve</h3>
+                        <p class="chart-desc">Displays the drop in MTTR (minutes) as the agent acquires more incident records in its knowledge base.</p>
+                        <div id="learningCurveChart" class="chart-svg-container"></div>
+                    </div>
 
-                <div class="service-breakdown">
-                    <h3>Incidents by Service</h3>
-                    <div id="serviceChart" class="chart"></div>
+                    <div class="chart-box">
+                        <h3>Incidents by Severity</h3>
+                        <div id="severityChart" class="chart"></div>
+                    </div>
+
+                    <div class="chart-box">
+                        <h3>Incidents by Service</h3>
+                                <div id="serviceChart" class="chart"></div>
+                    </div>
                 </div>
             </section>
+
+            <!-- Chat Tab removed — chat is now in the floating button panel -->
 
             <!-- History Tab -->
             <section id="history" class="tab-content">
                 <div class="section-header">
                     <h2>📋 Investigation History</h2>
-                    <p>Timeline of all investigations with results</p>
+                    <p>Timeline logs of all incidents analyzed by the system</p>
                 </div>
 
                 <div id="historyTimeline" class="timeline">Loading...</div>
@@ -212,15 +312,65 @@
 
         <!-- Footer -->
         <footer class="footer">
-            <p>Incident Response Agent v1.0.0 | Apache 2.0 License</p>
-            <p>Merging Aurora & IncidentFox for intelligent incident management</p>
+            <p>Team Secureonix#     HackBaroda 2026</p>
         </footer>
+    </div><!-- /.container -->
+
+    <!-- Floating Chat Button -->
+    <button id="floatingChatBtn" title="Ask Agent" aria-label="Open chat assistant">
+        <span id="chatBtnIcon">🤖</span>
+    </button>
+
+    <!-- Floating Chat Panel -->
+    <div id="floatingChatPanel" aria-hidden="true">
+        <div class="fcp-header">
+            <div class="fcp-title">
+                <span>🤖</span>
+                <span>Ask Agent — Knowledge Search</span>
+            </div>
+            <div class="fcp-header-actions">
+                <button id="maximizeChatPanel" aria-label="Maximize chat" title="Maximize">⛶</button>
+                <button id="closeChatPanel" aria-label="Close chat" title="Close">✕</button>
+            </div>
+        </div>
+        <div class="fcp-body" id="chatMessages">
+            <div class="fcp-msg agent">
+                <p>Hello! I am your incident response assistant. Ask me anything about past incidents, root causes, or resolutions.<br><em>e.g. "How do we resolve memory leaks?"</em></p>
+            </div>
+        </div>
+        <div class="fcp-footer">
+            <form id="chatForm">
+                <input type="text" id="chatInput" placeholder="Ask anything about past incidents..." required autocomplete="off">
+                <button type="submit">⚡</button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Terminal Modal Overlay -->
+    <div id="terminalModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center;">
+        <div class="terminal-card" style="width: 750px; background: #0f1419; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); overflow: hidden; display: flex; flex-direction: column;">
+            <div class="terminal-header" style="background: #171d24; padding: 10px 15px; display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <div class="terminal-buttons" style="display: flex; gap: 6px;">
+                    <span class="term-btn close" id="closeTerminal" style="width: 12px; height: 12px; border-radius: 50%; background: #ff5f56; display: inline-block; cursor: pointer;"></span>
+                    <span class="term-btn minimize" style="width: 12px; height: 12px; border-radius: 50%; background: #ffbd2e; display: inline-block;"></span>
+                    <span class="term-btn maximize" style="width: 12px; height: 12px; border-radius: 50%; background: #27c93f; display: inline-block;"></span>
+                </div>
+                <div class="terminal-title" style="flex: 1; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #a9b7c6; font-weight: 600;">Remediation Bash Shell</div>
+            </div>
+            <div class="terminal-body" id="terminalOutput" style="height: 350px; padding: 20px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #33ff33; line-height: 1.6; display: flex; flex-direction: column; gap: 8px; text-align: left;">
+                <p class="term-line" style="color: #808080;">[$] Initializing secure runtime context...</p>
+            </div>
+            <div class="terminal-footer" style="padding: 10px 15px; background: #171d24; display: flex; justify-content: flex-end; border-top: 1px solid rgba(255,255,255,0.05);">
+                <button class="btn btn-secondary" id="closeTerminalBtn" style="padding: 6px 14px; font-size: 13px;">Close Shell</button>
+            </div>
+        </div>
     </div>
 
     <!-- Loading Spinner -->
     <div id="loadingSpinner" class="loading-spinner hidden">
         <div class="spinner"></div>
-        <p>Investigating...</p>
+        <p>Running Automated Investigation phases...</p>
     </div>
 
     <script src="script.js"></script>
