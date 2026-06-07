@@ -310,7 +310,7 @@ curl -X POST http://localhost:8000/api/webhooks/alerts \
 ## 📸 Screenshots
 
 ### Live System Dashboard View
-![Dashboard View](screenshots/dashboard_view.png)
+![Dashboard View](screenshots/01-main-dashboard.png.jpeg)
 
 ### Main Dashboard
 ![Main Dashboard](screenshots/01-main-dashboard.png)
