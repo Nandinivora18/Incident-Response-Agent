@@ -1085,8 +1085,177 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   GUIDED TOUR STYLES
+   🎤 VOICE INPUT STYLES
    ═══════════════════════════════════════════════════════════ */
+
+/* Wrapper that puts input + mic button side by side */
+.voice-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.voice-input-wrap input {
+    flex: 1;
+}
+
+/* Label row with mic button on the right */
+.voice-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+.voice-label-row label {
+    margin-bottom: 0 !important;
+}
+
+/* Mic Button */
+.mic-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    background: rgba(139, 92, 246, 0.1);
+    color: #a78bfa;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s, box-shadow 0.2s, border-color 0.2s, transform 0.15s;
+    white-space: nowrap;
+    flex-shrink: 0;
+    position: relative;
+}
+.mic-btn:hover {
+    background: rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.7);
+    box-shadow: 0 0 18px rgba(139, 92, 246, 0.35);
+    transform: translateY(-1px);
+}
+.mic-btn:active {
+    transform: scale(0.96);
+}
+.mic-icon {
+    font-size: 15px;
+    line-height: 1;
+    transition: transform 0.15s;
+}
+.mic-label {
+    font-size: 12px;
+}
+
+/* Listening state */
+.mic-btn.listening {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.6);
+    color: #f87171;
+    animation: mic-pulse-ring 1.2s ease-in-out infinite;
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+}
+@keyframes mic-pulse-ring {
+    0%   { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+    60%  { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+.mic-btn.listening .mic-icon {
+    animation: mic-bounce 0.6s ease-in-out infinite alternate;
+}
+@keyframes mic-bounce {
+    from { transform: scale(1); }
+    to   { transform: scale(1.25); }
+}
+
+/* Voice status bar (shows while recording) */
+.voice-status-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    animation: fadeSlideIn 0.3s ease;
+}
+@keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Animated waveform bars */
+.voice-wave {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: 20px;
+    flex-shrink: 0;
+}
+.voice-wave span {
+    display: inline-block;
+    width: 3px;
+    border-radius: 2px;
+    background: #f87171;
+    animation: wave-bar 0.9s ease-in-out infinite;
+    min-height: 4px;
+}
+.voice-wave span:nth-child(1) { animation-delay: 0s;    height: 8px; }
+.voice-wave span:nth-child(2) { animation-delay: 0.15s; height: 14px; }
+.voice-wave span:nth-child(3) { animation-delay: 0.30s; height: 20px; }
+.voice-wave span:nth-child(4) { animation-delay: 0.45s; height: 14px; }
+.voice-wave span:nth-child(5) { animation-delay: 0.60s; height: 8px; }
+@keyframes wave-bar {
+    0%, 100% { transform: scaleY(0.4); opacity: 0.5; }
+    50%       { transform: scaleY(1.0); opacity: 1; }
+}
+
+.voice-status-txt {
+    font-size: 12px;
+    font-weight: 700;
+    color: #f87171;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.voice-interim {
+    flex: 1;
+    font-size: 12.5px;
+    color: rgba(255, 255, 255, 0.45);
+    font-style: italic;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.voice-stop-btn {
+    padding: 5px 12px;
+    border-radius: 7px;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    background: rgba(239, 68, 68, 0.12);
+    color: #f87171;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+    transition: background 0.15s;
+    flex-shrink: 0;
+}
+.voice-stop-btn:hover {
+    background: rgba(239, 68, 68, 0.22);
+}
+
+/* Not-supported message */
+.voice-not-supported {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 4px 0;
+}
+
+
 
 .tour-overlay-segment {
     position: fixed;

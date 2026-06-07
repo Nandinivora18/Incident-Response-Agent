@@ -60,7 +60,12 @@
                     <form id="investigateForm" class="form-grid">
                         <div class="form-group">
                             <label for="title">Incident Title *</label>
-                            <input type="text" id="title" name="title" placeholder="e.g., High CPU Usage on Database" required>
+                            <div class="voice-input-wrap">
+                                <input type="text" id="title" name="title" placeholder="e.g., High CPU Usage on Database" required>
+                                <button type="button" id="voiceTitleBtn" class="mic-btn" title="Speak incident title">
+                                    <span class="mic-icon">🎤</span>
+                                </button>
+                            </div>
                         </div>
 
                         <div class="form-group">
@@ -85,8 +90,23 @@
                         </div>
 
                         <div class="form-group full-width">
-                            <label for="description">Description *</label>
+                            <div class="voice-label-row">
+                                <label for="description">Description *</label>
+                                <button type="button" id="voiceDescBtn" class="mic-btn" title="Speak incident description">
+                                    <span class="mic-icon">🎤</span>
+                                    <span class="mic-label">Speak</span>
+                                </button>
+                            </div>
                             <textarea id="description" name="description" placeholder="Describe the symptoms of the incident..." required></textarea>
+                            <!-- Voice status banner (shown while recording) -->
+                            <div id="voiceStatusBar" class="voice-status-bar" style="display:none">
+                                <div class="voice-wave">
+                                    <span></span><span></span><span></span><span></span><span></span>
+                                </div>
+                                <span id="voiceStatusText" class="voice-status-txt">Listening…</span>
+                                <span id="voiceInterim" class="voice-interim"></span>
+                                <button type="button" id="voiceStopBtn" class="voice-stop-btn">⏹ Stop</button>
+                            </div>
                         </div>
 
                         <div class="form-group full-width">
@@ -474,6 +494,7 @@
         </div>
     </div>
 
+    <script src="voice.js"></script>
     <script src="particles.js"></script>
     <script src="demo.js"></script>
     <script src="script.js"></script>
