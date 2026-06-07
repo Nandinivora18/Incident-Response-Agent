@@ -334,7 +334,7 @@ curl -X POST http://localhost:8000/api/webhooks/alerts \
 ![History](screenshots/07-history.png)
 
 ### Step by step recommendations plans
-![History](screenshots/08-shell.png)
+![Shell](screenshots/08-shell.png)
 
 ---
 
