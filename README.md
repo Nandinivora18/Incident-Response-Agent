@@ -150,7 +150,7 @@ The dataset spans two temporal batches (INC-2026-001 to INC-2026-066) designed t
 ## 📁 Project Structure
 
 ```
-incident-response-agent/
+Incident-Response-Agent-main/
 ├── agents/
 │   └── agents.py              # 7 specialized investigation agents
 ├── api/
@@ -160,9 +160,7 @@ incident-response-agent/
 │   └── knowledge_manager.py   # KB CRUD + similarity matching
 ├── config/
 │   └── settings.py            # Environment-based configuration
-├── data/
-│   └── incidents_dataset.json # 66 pre-seeded incident records
-├── frontend/
+├── frontend/                  # Web dashboard UI files
 │   ├── index.html             # SPA shell
 │   ├── script.js              # All UI logic (~930 lines)
 │   └── style.css              # Glassmorphism theme (~1350 lines)
@@ -182,6 +180,11 @@ incident-response-agent/
 ├── run_web_server.py          # Web server launcher
 ├── requirements.txt
 ├── .env.example
+├── GETTING_STARTED.md         # Guide on getting started
+├── PROJECT_SUMMARY.md         # High-level architecture overview
+├── USER_GUIDE.md              # User guide for running agent
+├── setup.bat                  # Setup script for Windows
+├── setup.sh                   # Setup script for Linux/macOS
 ├── Dockerfile
 ├── docker-compose.yml
 └── README.md
@@ -200,7 +203,7 @@ incident-response-agent/
 
 ```bash
 git clone https://github.com/Nandinivora18/Incident-Response-Agent.git
-cd Incident-Response-Agent
+cd Incident-Response-Agent-main
 ```
 
 ### 2. Create Virtual Environment
@@ -306,26 +309,32 @@ curl -X POST http://localhost:8000/api/webhooks/alerts \
 
 ## 📸 Screenshots
 
+### Live System Dashboard View
+![Dashboard View](screenshots/dashboard_view.png)
+
 ### Main Dashboard
-![Main Dashboard](screenshots/01-main-page.png)
+![Main Dashboard](screenshots/01-main-dashboard.png)
 
-### Investigation Form + Agent Workflow Timeline
-![Investigation](screenshots/02-investigation-form.png)
+### Investigation Input Form
+![Investigation Form](screenshots/02-investigate-form.png)
 
-### Investigation Results — Root Cause + Remediation Plan
-![Results](screenshots/03-investigation-results.png)
+### Active Agent Investigation Progress
+![Investigation Running](screenshots/03-investigation-running.png)
 
-### Knowledge Base — Incidents, Root Causes, Solutions
-![Knowledge Base](screenshots/04-knowledge-base.png)
+### Detailed Investigation Results
+![Investigation Results](screenshots/04-investigation-results.png)
 
-### Statistics — MTTR Learning Curve + Charts
-![Statistics](screenshots/statistics.png)
+### Knowledge Base Explorer
+![Knowledge Base](screenshots/05-knowledge-base.png)
 
-### Floating AI Assistant (Ask Agent)
-![Chat Panel](screenshots/chat-panel.png)
+### Learning Metrics & Statistics Curve
+![Statistics](screenshots/06-statistics.png)
 
-### Remediation Terminal Shell
-![Terminal](screenshots/terminal.png)
+### Investigation Audit History
+![History](screenshots/07-history.png)
+
+### Step by step recommendations plans
+![History](screenshots/08-shell.png)
 
 ---
 
