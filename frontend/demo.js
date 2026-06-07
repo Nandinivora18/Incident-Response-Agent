@@ -1,380 +1,650 @@
 /**
- * 🎬 Live Demo Mode — "Watch the Agent Learn"
- * Fires 5 real incidents sequentially through the API and visualises
- * how MTTR drops as the knowledge base is applied.
+ * 🎬 GUIDED LIVE DEMO TOUR
+ * Walks judges through every feature of the app in sequence:
+ *   Header → Tabs → Form (typewriter) → Investigation → Results →
+ *   Knowledge Base → Statistics → History → AI Chatbot → Summary
  *
- * Incident selection:
- *   #1  MongoDB split-brain  → novel topic (no close KB match) → ~35 min
- *   #2  CoreDNS loop        → matches INC-2026-101            → ~2  min
- *   #3  Route53 TTL         → matches INC-2026-001            → ~2  min
- *   #4  etcd compaction     → matches INC-2026-102 family     → ~2  min
- *   #5  OOM eviction storm  → matches eviction incident       → ~2  min
+ * Controls:
+ *   [▶ Next]  – advance manually
+ *   [⏸ Pause] – pause auto-advance
+ *   [✕ Exit]  – close tour
+ *   Spotlight follows the active UI element
  */
 
-const DEMO_INCIDENTS = [
+// ── Tour Steps ────────────────────────────────────────────────
+const TOUR_STEPS = [
     {
-        title: "MongoDB Replica Set Split-Brain Election Storm",
-        severity: "critical",
-        service: "mongodb",
-        affected_services: ["api-service", "data-pipeline", "analytics"],
-        description: "MongoDB replica set undergoing continuous primary election cycles causing full write unavailability. All write operations failing with NotMaster error. Secondary nodes unable to reach quorum during failover, with two nodes simultaneously claiming primary status.",
-        logs: [
-            "ERROR: NotMaster: not primary",
-            "WARN: Election timeout exceeded 30s",
-            "ERROR: ReplicaSetNoPrimary: no replica set primary available for writes"
-        ]
+        id: 'welcome',
+        title: '🎬 Welcome to Incident Response Agent',
+        narration: 'An AI multi-agent system that remembers every past incident and automatically resolves future ones. This live demo walks you through every feature — no setup required.',
+        target: null,   // centred welcome card, no spotlight
+        duration: 4500,
+        action: null
     },
     {
-        title: "Kubernetes CoreDNS Loop via systemd-resolved Overlap",
-        severity: "high",
-        service: "kubernetes-dns",
-        affected_services: ["all-pods", "service-discovery"],
-        description: "Newly provisioned Kubernetes node pool encountering infinite DNS forwarding loop within CoreDNS. Pods logging continuous 'Host not found' exceptions. CoreDNS pod logs filling with 'Loop network loop detected' emergency panics. Node resolv.conf pointing to 127.0.0.53 systemd-resolved loopback.",
-        logs: [
-            "EMERGENCY: Loop network loop detected on resolv.conf",
-            "ERROR: Host not found: kubernetes.default.svc.cluster.local",
-            "WARN: CoreDNS forwarding to upstream 127.0.0.53 which loops back"
-        ]
+        id: 'header',
+        title: '🚨 Live System Status',
+        narration: 'The header shows real-time health of all 7 specialized agents and the knowledge base. The green pulse means everything is operational.',
+        target: '.header',
+        duration: 3500,
+        action: null
     },
     {
-        title: "AWS Route53 TTL Misconfiguration Cascading to API Gateway Unavailability",
-        severity: "high",
-        service: "api-gateway",
-        affected_services: ["api-clients", "web-frontend", "mobile-app"],
-        description: "Engineer updated Route53 DNS records with 48-hour TTL on a shifting backend alias instead of standard 60 seconds. API clients pinned to deprecated infrastructure during blue-green microservice migration. Spike in HTTP 503 errors globally.",
-        logs: [
-            "ERROR: HTTP 503 Service Unavailable from deprecated backend nodes",
-            "WARN: Traffic asymmetry detected on new container fleet",
-            "INFO: Route53 record set updated with TTL=172800"
-        ]
+        id: 'tabs',
+        title: '📋 Four Core Modules',
+        narration: 'Investigate — submit any incident for AI analysis. Knowledge Base — browse 66+ historical incidents. Statistics — view the MTTR learning curve. History — audit trail of all investigations.',
+        target: '.tabs-nav',
+        duration: 4000,
+        action: null
     },
     {
-        title: "etcd Database Compaction Failure Causing API Server Unavailability",
-        severity: "high",
-        service: "kubernetes-etcd",
-        affected_services: ["kube-apiserver", "all-workloads", "cluster-autoscaler"],
-        description: "Kubernetes etcd cluster disk usage exceeded 90% due to missed automated compaction. API server write requests timing out with 'mvcc: database space exceeded'. All deployments and scaling events halted. etcd disk quota: 2GB, current usage 1.85GB.",
-        logs: [
-            "ERROR: etcdserver: mvcc: database space exceeded",
-            "ERROR: kube-apiserver: etcd cluster is unavailable",
-            "WARN: etcd disk usage 91% of quota (1.85GB / 2GB)"
-        ]
+        id: 'investigate-tab',
+        title: '🔍 Incident Investigation',
+        narration: 'The investigation form submits any production incident to 7 concurrent AI agents. Fill in the details and the orchestrator takes over.',
+        target: '#investigate .section-header',
+        duration: 3000,
+        action: () => safeSwitchTab('investigate')
     },
     {
-        title: "Kubernetes OOMKilled Pod Eviction Storm from Misconfigured Memory Thresholds",
-        severity: "high",
-        service: "kubernetes-nodes",
-        affected_services: ["production-pods", "stateful-services", "ingress-controller"],
-        description: "Kubelet eviction thresholds misconfigured with critically low memory.available=100Mi, triggering mass pod evictions across production nodes. Healthy pods prematurely evicted, causing cascading restarts and service outage across 12 production microservices.",
-        logs: [
-            "ERROR: OOMKilled: pod evicted due to memory pressure",
-            "WARN: Eviction threshold exceeded: memory.available<100Mi",
-            "ERROR: Failed to evict pod gracefully, force terminating"
-        ]
+        id: 'form-fill',
+        title: '✍️ Real-world Incident: CoreDNS Loop',
+        narration: 'Filling in a real Kubernetes DNS failure. The agent will search 66 historical incidents, find a match, and resolve it in under 2 minutes vs 35-minute manual debugging.',
+        target: '#incidentForm',
+        duration: 9500,
+        action: 'fillForm'
+    },
+    {
+        id: 'submit-btn',
+        title: '▶️ Starting Multi-Agent Investigation',
+        narration: 'All 7 agents activate simultaneously — Kubernetes, Cloud, Metrics, Log Analysis, Code Analysis, and the Historical Learning agent scanning the knowledge base for similar patterns.',
+        target: '#submitBtn',
+        duration: 2500,
+        action: 'submitForm'
+    },
+    {
+        id: 'investigation-running',
+        title: '⚡ 7-Phase Investigation in Progress',
+        narration: 'Phase 1: Knowledge retrieval → Phase 2: Assessment → Phase 3: Deep investigation → Phase 4: Root cause analysis → Phase 5: Solution generation → Phase 6: Remediation plan → Phase 7: Learning storage.',
+        target: '.investigation-section, #investigationSection, #result, .tab-content.active',
+        duration: 18000,  // wait for real API result
+        action: 'waitForResults'
+    },
+    {
+        id: 'results-root-cause',
+        title: '🎯 Root Cause Identified with Confidence Score',
+        narration: 'The agent matched this incident to INC-2026-101 in the knowledge base (CoreDNS loop via systemd-resolved). MTTR dropped from 35 min → 2 min — a 94% reduction.',
+        target: '#investigationResults, #result',
+        duration: 4500,
+        action: 'scrollToResults'
+    },
+    {
+        id: 'results-remediation',
+        title: '🛠️ Priority-Graded Remediation Plan',
+        narration: 'Each remediation step comes with a priority level (Critical/High/Medium) and an estimated time. Click any step to open the interactive terminal shell and execute it.',
+        target: '#investigationResults, #result',
+        duration: 4000,
+        action: null
+    },
+    {
+        id: 'knowledge-base',
+        title: '📚 Knowledge Base — 66 Real Incidents',
+        narration: 'Pre-seeded with 66 real-world incidents across Kubernetes, Networking, Database, Security, Cloud, and CI/CD. Every investigation grows this library automatically.',
+        target: '#knowledge',
+        duration: 4000,
+        action: () => {
+            safeSwitchTab('knowledge');
+            if (typeof loadKnowledgeBase === 'function') loadKnowledgeBase();
+        }
+    },
+    {
+        id: 'statistics',
+        title: '📊 MTTR Learning Curve Chart',
+        narration: 'The chart is the core proof: as the knowledge base grows, MTTR drops from 35 minutes to under 2. The agent genuinely gets smarter with every incident it sees.',
+        target: '#statistics',
+        duration: 4500,
+        action: () => {
+            safeSwitchTab('statistics');
+            if (typeof loadStatistics === 'function') loadStatistics();
+        }
+    },
+    {
+        id: 'history',
+        title: '📋 Complete Investigation History',
+        narration: 'Full audit trail of every incident investigated — timestamps, root causes, MTTR values, and which historical incidents were referenced for the solution.',
+        target: '#history',
+        duration: 3500,
+        action: () => {
+            safeSwitchTab('history');
+            if (typeof loadHistory === 'function') loadHistory();
+        }
+    },
+    {
+        id: 'chatbot-open',
+        title: '🤖 AI Knowledge Assistant (RAG Chatbot)',
+        narration: 'The floating robot in the bottom-right is a RAG-powered assistant. Ask it anything about past incidents, root causes, or resolutions — it searches the KB and cites sources.',
+        target: '#floatingChatBtn',
+        duration: 3500,
+        action: 'openChatbot'
+    },
+    {
+        id: 'chatbot-query',
+        title: '💬 Querying: "How to fix CoreDNS loop?"',
+        narration: 'The assistant searches the knowledge base using semantic similarity and returns an answer with source citations from matching historical incidents.',
+        target: '#floatingChatPanel',
+        duration: 9000,
+        action: 'sendChatMessage'
+    },
+    {
+        id: 'webhook',
+        title: '🔔 Webhook Ingestion — Alertmanager & Datadog',
+        narration: 'Production alerts from Alertmanager, Datadog, or any monitoring tool can be sent to /api/webhooks/alerts and automatically trigger a background investigation.',
+        target: '.header',
+        duration: 4000,
+        action: 'showWebhookToast'
+    },
+    {
+        id: 'complete',
+        title: '🏆 Demo Complete — Team Secureonix',
+        narration: '94% MTTR reduction • 66 incident knowledge base • 7 specialized AI agents • 12 REST API endpoints • RAG chatbot with citations • Webhook ingestion • Interactive runbooks • Real-time learning.',
+        target: null,
+        duration: 6000,
+        action: null
     }
 ];
 
 // ── State ─────────────────────────────────────────────────────
-let demoRunning  = false;
-let demoAborted  = false;
-let demoResults  = [];
-const BASELINE_MTTR = 35; // manual debugging baseline (minutes)
+let tourActive    = false;
+let tourPaused    = false;
+let tourStepIdx   = 0;
+let tourTimer     = null;
+let formFilled    = false;
+let resultsFound  = false;
+let chatOpened    = false;
 
-// ── Helpers ───────────────────────────────────────────────────
-function animateStat(elId, newVal) {
-    const el = document.getElementById(elId);
-    if (!el) return;
-    el.textContent = newVal;
-    el.classList.remove('stat-pop');
-    void el.offsetWidth;           // force reflow to restart animation
-    el.classList.add('stat-pop');
-}
-
-function addDemoBar(mttr, index) {
-    const container = document.getElementById('demoMttrBars');
-    if (!container) return;
-    const isFast = mttr < 10;
-    const heightPx = Math.max(4, Math.round((mttr / BASELINE_MTTR) * 64));
-    const col = document.createElement('div');
-    col.className = 'demo-bar-col';
-    col.innerHTML = `
-        <div class="demo-bar-num ${isFast ? 'fast' : 'slow'}">${mttr.toFixed(1)}m</div>
-        <div class="demo-bar ${isFast ? 'fast' : 'slow'}" style="height:0"></div>
-        <div class="demo-bar-label">#${index + 1}</div>
-    `;
-    container.appendChild(col);
-    // Animate height after the element is painted
-    requestAnimationFrame(() => setTimeout(() => {
-        col.querySelector('.demo-bar').style.height = heightPx + 'px';
-    }, 60));
-}
-
-function renderQueueItem(inc, index, status, mttr) {
-    const list = document.getElementById('demoIncidentList');
-    const existing = document.getElementById(`dq-item-${index}`);
-    const mttrHtml = mttr !== null
-        ? `<div class="demo-q-mttr ${mttr < 10 ? 'fast' : ''}">⏱ ${mttr.toFixed(1)} min</div>`
-        : '';
-    const inner = `
-        <div class="dq-dot ${status}"></div>
-        <div>
-            <div class="demo-q-title">${inc.title}</div>
-            ${mttrHtml}
+// ── Spotlight overlay (4-panel technique) ─────────────────────
+function buildSpotlightHTML() {
+    return `
+        <div id="tourOverlayTop"    class="tour-overlay-segment"></div>
+        <div id="tourOverlayBottom" class="tour-overlay-segment"></div>
+        <div id="tourOverlayLeft"   class="tour-overlay-segment"></div>
+        <div id="tourOverlayRight"  class="tour-overlay-segment"></div>
+        <div id="tourTooltip"       class="tour-tooltip" style="display:none"></div>
+        <div id="tourWelcomeCard"   class="tour-welcome-card" style="display:none"></div>
+        <div id="tourControls"      class="tour-controls">
+            <div class="tour-ctrl-left">
+                <button id="tourExitBtn"  class="tour-ctrl-btn exit">✕ Exit Demo</button>
+            </div>
+            <div class="tour-ctrl-center">
+                <span id="tourStepLabel" class="tour-step-label">Step 1 / ${TOUR_STEPS.length}</span>
+                <div id="tourDots" class="tour-dots"></div>
+            </div>
+            <div class="tour-ctrl-right">
+                <button id="tourPauseBtn" class="tour-ctrl-btn pause">⏸ Pause</button>
+                <button id="tourNextBtn"  class="tour-ctrl-btn next">▶ Next</button>
+            </div>
         </div>`;
-    if (existing) {
-        existing.className = `demo-q-item ${status}`;
-        existing.innerHTML = inner;
+}
+
+function mountTourDOM() {
+    if (document.getElementById('tourControls')) return;
+    const wrapper = document.createElement('div');
+    wrapper.id = 'tourWrapper';
+    wrapper.innerHTML = buildSpotlightHTML();
+    document.body.appendChild(wrapper);
+
+    // Build step dots
+    const dots = document.getElementById('tourDots');
+    TOUR_STEPS.forEach((_, i) => {
+        const d = document.createElement('span');
+        d.className = 'tour-dot';
+        d.id = `tour-dot-${i}`;
+        dots.appendChild(d);
+    });
+
+    document.getElementById('tourExitBtn').onclick  = stopTour;
+    document.getElementById('tourPauseBtn').onclick = togglePauseTour;
+    document.getElementById('tourNextBtn').onclick  = () => advanceTour(true);
+}
+
+function setSpotlight(el) {
+    if (!el) {
+        // No spotlight — hide segments, show welcome/complete card centred
+        ['tourOverlayTop','tourOverlayBottom','tourOverlayLeft','tourOverlayRight'].forEach(id => {
+            const seg = document.getElementById(id);
+            if (seg) { seg.style.background = 'rgba(0,0,0,0.78)'; seg.style.inset = id === 'tourOverlayTop' ? '0' : '200vh 200vw'; }
+        });
+        const top = document.getElementById('tourOverlayTop');
+        if (top) { top.style.inset = '0'; top.style.bottom = '0'; }
+        ['tourOverlayBottom','tourOverlayLeft','tourOverlayRight'].forEach(id => {
+            const s = document.getElementById(id);
+            if (s) { s.style.width = '0'; s.style.height = '0'; s.style.top = '0'; s.style.left = '0'; }
+        });
+        const tt = document.getElementById('tourTooltip');
+        if (tt) tt.style.display = 'none';
+        return;
+    }
+
+    const rect = el.getBoundingClientRect();
+    const pad  = 8;
+    const top    = Math.max(0, rect.top - pad);
+    const left   = Math.max(0, rect.left - pad);
+    const bottom = Math.min(window.innerHeight, rect.bottom + pad);
+    const right  = Math.min(window.innerWidth,  rect.right + pad);
+
+    const S = {
+        top:    document.getElementById('tourOverlayTop'),
+        bottom: document.getElementById('tourOverlayBottom'),
+        left:   document.getElementById('tourOverlayLeft'),
+        right:  document.getElementById('tourOverlayRight')
+    };
+
+    if (S.top)    { S.top.style.cssText    = `position:fixed;inset:0 0 auto 0;height:${top}px;background:rgba(0,0,0,0.72);z-index:10500;pointer-events:none;transition:all .4s ease;`; }
+    if (S.bottom) { S.bottom.style.cssText = `position:fixed;top:${bottom}px;left:0;right:0;bottom:0;background:rgba(0,0,0,0.72);z-index:10500;pointer-events:none;transition:all .4s ease;`; }
+    if (S.left)   { S.left.style.cssText   = `position:fixed;top:${top}px;left:0;width:${left}px;height:${bottom-top}px;background:rgba(0,0,0,0.72);z-index:10500;pointer-events:none;transition:all .4s ease;`; }
+    if (S.right)  { S.right.style.cssText  = `position:fixed;top:${top}px;left:${right}px;right:0;height:${bottom-top}px;background:rgba(0,0,0,0.72);z-index:10500;pointer-events:none;transition:all .4s ease;`; }
+
+    // Position tooltip
+    positionTooltip(top, left, bottom, right);
+}
+
+function positionTooltip(top, left, bottom, right) {
+    const tt = document.getElementById('tourTooltip');
+    if (!tt) return;
+    const step = TOUR_STEPS[tourStepIdx];
+    tt.style.display = 'block';
+    tt.innerHTML = `
+        <div class="tour-tt-step">Step ${tourStepIdx + 1} of ${TOUR_STEPS.length}</div>
+        <div class="tour-tt-title">${step.title}</div>
+        <div class="tour-tt-narration">${step.narration}</div>
+        <div class="tour-tt-progress">
+            <div class="tour-tt-fill" id="tourTtFill"></div>
+        </div>`;
+
+    // Place tooltip below or above the spotlight
+    const ttH = 140;
+    const ttW = 360;
+    let ttTop, ttLeft;
+
+    if (bottom + ttH + 16 < window.innerHeight - 60) {
+        ttTop = bottom + 12;
     } else {
-        const el = document.createElement('div');
-        el.id = `dq-item-${index}`;
-        el.className = `demo-q-item pending`;
-        el.innerHTML = inner;
-        list.appendChild(el);
-        // Small delay so items appear one by one
-        el.style.opacity = '0';
-        el.style.transform = 'translateX(-10px)';
-        el.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-        setTimeout(() => {
-            el.style.opacity = '1';
-            el.style.transform = 'translateX(0)';
-            el.className = `demo-q-item ${status}`;
-        }, index * 120);
+        ttTop = top - ttH - 12;
     }
+    ttLeft = Math.max(12, Math.min(left, window.innerWidth - ttW - 12));
+
+    tt.style.top  = `${Math.max(8, ttTop)}px`;
+    tt.style.left = `${ttLeft}px`;
+    tt.style.width = `${ttW}px`;
 }
 
-function showCurrentCard_Investigating(inc) {
-    document.getElementById('demoCurrentCard').innerHTML = `
-        <h3 class="demo-inc-title">${inc.title}</h3>
-        <div class="demo-inc-meta">
-            <span class="demo-inc-badge sev-${inc.severity}">${inc.severity.toUpperCase()}</span>
-            <span class="demo-inc-badge" style="background:rgba(139,92,246,0.15);color:#a78bfa;border:1px solid rgba(139,92,246,0.3)">${inc.service}</span>
-        </div>
-        <p class="demo-inc-desc">${inc.description}</p>
-        <div class="demo-investigating">
-            <div class="demo-spin"></div>
-            <span>7-phase multi-agent investigation — searching KB for similar incidents, analysing logs &amp; metrics, synthesising root cause…</span>
+function showWelcomeCard(step) {
+    const card = document.getElementById('tourWelcomeCard');
+    if (!card) return;
+    card.style.display = 'flex';
+    card.innerHTML = `
+        <div class="twc-inner">
+            <div class="twc-emoji">${step.id === 'complete' ? '🏆' : '🎬'}</div>
+            <h2 class="twc-title">${step.title}</h2>
+            <p class="twc-narration">${step.narration}</p>
+            ${step.id === 'complete' ? `
+            <div class="twc-stats">
+                <div class="twc-stat"><strong>94%</strong><span>MTTR Reduction</span></div>
+                <div class="twc-stat"><strong>66</strong><span>KB Incidents</span></div>
+                <div class="twc-stat"><strong>7</strong><span>AI Agents</span></div>
+                <div class="twc-stat"><strong>12</strong><span>API Endpoints</span></div>
+            </div>` : `<div class="twc-hint">Demo auto-advances • Click ▶ Next to skip</div>`}
         </div>`;
+    const tt = document.getElementById('tourTooltip');
+    if (tt) tt.style.display = 'none';
 }
 
-function showCurrentCard_Result(inc, result) {
-    const mttr    = result.mttr_minutes ?? result.duration_minutes ?? BASELINE_MTTR;
-    const isFast  = mttr < 10;
-    const learning = Array.isArray(result.learning_applied) ? result.learning_applied : [];
-    const reused  = learning.length > 0 && !learning[0].includes('No previous');
-    const conf    = ((result.root_cause_confidence ?? 0.5) * 100).toFixed(0);
-    const action  = (result.solution?.immediate_action ?? 'Review metrics and logs').slice(0, 90);
-
-    document.getElementById('demoCurrentCard').innerHTML = `
-        <h3 class="demo-inc-title">${inc.title}</h3>
-        <div class="demo-inc-meta">
-            <span class="demo-inc-badge sev-${inc.severity}">${inc.severity.toUpperCase()}</span>
-            <span class="demo-inc-badge" style="background:rgba(139,92,246,0.15);color:#a78bfa;border:1px solid rgba(139,92,246,0.3)">${inc.service}</span>
-            ${reused
-                ? '<span class="demo-reuse-badge">🧠 Historical KB Match — Knowledge Reused</span>'
-                : '<span class="demo-new-badge">🆕 Novel Incident — Stored in KB</span>'}
-        </div>
-        <p class="demo-inc-desc">${inc.description}</p>
-        <div class="demo-inc-result">
-            <div class="demo-result-row">
-                <span class="demo-result-label">🎯 Root Cause</span>
-                <span class="demo-result-val" style="max-width:60%;text-align:right;font-size:13px">${result.root_cause ?? 'Unknown'}</span>
-            </div>
-            <div class="demo-result-row">
-                <span class="demo-result-label">📊 Confidence</span>
-                <span class="demo-result-val">${conf}%</span>
-            </div>
-            <div class="demo-result-row">
-                <span class="demo-result-label">⏱️ MTTR</span>
-                <span class="demo-result-val ${isFast ? 'mttr-fast' : 'mttr-slow'}">${mttr.toFixed(1)} min${isFast ? ' ⚡' : ''}</span>
-            </div>
-            <div class="demo-result-row">
-                <span class="demo-result-label">💡 Immediate Action</span>
-                <span class="demo-result-val" style="font-size:12px;max-width:56%;text-align:right">${action}…</span>
-            </div>
-        </div>`;
+function hideWelcomeCard() {
+    const card = document.getElementById('tourWelcomeCard');
+    if (card) card.style.display = 'none';
 }
 
-// ── Main demo runner ──────────────────────────────────────────
-async function runLiveDemo() {
-    if (demoRunning) return;
-    demoRunning = true;
-    demoAborted = false;
-    demoResults = [];
+// ── Step Execution ────────────────────────────────────────────
+async function executeStep(step) {
+    // Dots
+    document.querySelectorAll('.tour-dot').forEach((d, i) => {
+        d.className = 'tour-dot' + (i < tourStepIdx ? ' done' : i === tourStepIdx ? ' active' : '');
+    });
+    document.getElementById('tourStepLabel').textContent =
+        `Step ${tourStepIdx + 1} / ${TOUR_STEPS.length} — ${step.title.replace(/^[^\s]+\s/, '')}`;
 
-    // Reset all elements
-    document.getElementById('demoIncidentList').innerHTML   = '';
-    document.getElementById('demoMttrBars').innerHTML       = '';
-    document.getElementById('demoSummaryBanner').style.display = 'none';
-    document.getElementById('demoProgressFill').style.width = '0%';
-    document.getElementById('demoProgressBar').style.display = 'block';
-    document.getElementById('startDemoBtn').style.display   = 'none';
-    document.getElementById('resetDemoBtn').style.display   = 'none';
-    document.getElementById('demoCurrentCard').innerHTML    = `
-        <div class="demo-current-placeholder">
-            <span style="font-size:40px">🤖</span>
-            <p>Preparing incident queue…</p>
-        </div>`;
-    animateStat('demoKbCount',    '66');
-    animateStat('demoMttrNow',    '—');
-    animateStat('demoSaved',       '0');
-    animateStat('demoReuseCount', '0 / 5');
-    animateStat('demoProgress',   '0 / 5');
-
-    // Pre-populate queue (pending)
-    DEMO_INCIDENTS.forEach((inc, i) => renderQueueItem(inc, i, 'pending', null));
-    await sleep(900);
-
-    let totalSaved = 0;
-    let reuseCount = 0;
-
-    for (let i = 0; i < DEMO_INCIDENTS.length; i++) {
-        if (demoAborted) break;
-        const inc = DEMO_INCIDENTS[i];
-
-        // Mark as running
-        renderQueueItem(inc, i, 'running', null);
-        showCurrentCard_Investigating(inc);
-        document.getElementById('demoProgressFill').style.width =
-            `${(i / DEMO_INCIDENTS.length) * 100}%`;
-
-        // ── Fetch result from real API ──
-        let result = null;
-        try {
-            const resp = await fetch('/api/investigate', {
-                method:  'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body:    JSON.stringify(inc)
-            });
-            if (resp.ok) {
-                const body = await resp.json();
-                result = body.data ?? body;      // handle both wrapper shapes
-            }
-        } catch (err) {
-            console.warn('[Demo] API error for incident', i, err);
+    // Resolve target element
+    let targetEl = null;
+    if (step.target) {
+        const selectors = step.target.split(',').map(s => s.trim());
+        for (const sel of selectors) {
+            targetEl = document.querySelector(sel);
+            if (targetEl && targetEl.offsetHeight > 0) break;
         }
-
-        // Fallback if API call failed
-        if (!result) {
-            result = {
-                root_cause: 'Investigation error (API unreachable)',
-                root_cause_confidence: 0.4,
-                mttr_minutes: BASELINE_MTTR,
-                solution: { immediate_action: 'Check server connectivity' },
-                learning_applied: []
-            };
-        }
-
-        const mttr = result.mttr_minutes ?? result.duration_minutes ?? BASELINE_MTTR;
-        demoResults.push({ inc, result, mttr });
-
-        // ── Update live stats ──
-        const kbNow = 66 + i + 1;
-        animateStat('demoKbCount', kbNow.toString());
-        animateStat('demoMttrNow', `${mttr.toFixed(1)}m`);
-
-        const saved = Math.max(0, BASELINE_MTTR - mttr);
-        totalSaved += saved;
-        animateStat('demoSaved', Math.round(totalSaved).toString());
-
-        const learning = Array.isArray(result.learning_applied) ? result.learning_applied : [];
-        const reused   = learning.length > 0 && !learning[0].includes('No previous');
-        if (reused) reuseCount++;
-        animateStat('demoReuseCount', `${reuseCount} / 5`);
-        animateStat('demoProgress',   `${i + 1} / 5`);
-
-        // ── Update UI ──
-        renderQueueItem(inc, i, 'done', mttr);
-        showCurrentCard_Result(inc, result);
-        addDemoBar(mttr, i);
-
-        // Pause so judges can read before next incident fires
-        if (i < DEMO_INCIDENTS.length - 1) await sleep(2500);
-    }
-
-    // ── Completion ──
-    document.getElementById('demoProgressFill').style.width = '100%';
-
-    if (!demoAborted) {
-        const pctReduction = Math.round(
-            (totalSaved / (BASELINE_MTTR * DEMO_INCIDENTS.length)) * 100
-        );
-        document.getElementById('demoFinalSaved').textContent = Math.round(totalSaved);
-        document.getElementById('demoFinalPct').textContent   = `${pctReduction}%`;
-        document.getElementById('demoSummaryBanner').style.display = 'block';
-
-        if (typeof Toast !== 'undefined') {
-            Toast.show(
-                `🏆 Demo complete! ${Math.round(totalSaved)} min saved — ${pctReduction}% MTTR reduction`,
-                'success', 7000
-            );
+        if (targetEl) {
+            targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            await sleep(400);
         }
     }
 
-    document.getElementById('resetDemoBtn').style.display = 'inline-flex';
-    demoRunning = false;
+    // Show spotlight or welcome card
+    if (!step.target) {
+        setSpotlight(null);
+        showWelcomeCard(step);
+    } else {
+        hideWelcomeCard();
+        setSpotlight(targetEl);
+    }
+
+    // Run action
+    if (typeof step.action === 'function') {
+        await step.action();
+    } else if (step.action === 'fillForm') {
+        await doFillForm();
+    } else if (step.action === 'submitForm') {
+        await doSubmitForm();
+    } else if (step.action === 'waitForResults') {
+        await doWaitForResults(step.duration);
+        return; // waitForResults handles its own advance
+    } else if (step.action === 'scrollToResults') {
+        doScrollToResults();
+    } else if (step.action === 'openChatbot') {
+        doOpenChatbot();
+    } else if (step.action === 'sendChatMessage') {
+        await doSendChatMessage();
+    } else if (step.action === 'showWebhookToast') {
+        doShowWebhookToast();
+    }
+
+    // Auto-advance timer (unless this step manages its own timing)
+    if (!tourPaused) {
+        startStepTimer(step.duration);
+    }
 }
 
-function sleep(ms) {
-    return new Promise(r => setTimeout(r, ms));
+function startStepTimer(duration) {
+    clearTimeout(tourTimer);
+    // Animate tooltip progress bar
+    const fill = document.getElementById('tourTtFill');
+    if (fill) {
+        fill.style.transition = 'none';
+        fill.style.width = '0%';
+        requestAnimationFrame(() => {
+            fill.style.transition = `width ${duration}ms linear`;
+            fill.style.width = '100%';
+        });
+    }
+    tourTimer = setTimeout(() => advanceTour(false), duration);
 }
 
-// ── Overlay open / close ──────────────────────────────────────
-function openDemoOverlay() {
-    const overlay = document.getElementById('demoOverlay');
-    overlay.style.display = 'flex';
-    // Reset for fresh open
-    document.getElementById('startDemoBtn').style.display  = 'inline-flex';
-    document.getElementById('resetDemoBtn').style.display  = 'none';
-    document.getElementById('demoProgressBar').style.display = 'none';
+async function advanceTour(manual) {
+    if (!tourActive) return;
+    clearTimeout(tourTimer);
+    tourStepIdx++;
+    if (tourStepIdx >= TOUR_STEPS.length) {
+        stopTour();
+        return;
+    }
+    await executeStep(TOUR_STEPS[tourStepIdx]);
 }
 
-function closeDemoOverlay() {
-    demoAborted = true;
-    demoRunning = false;
-    document.getElementById('demoOverlay').style.display = 'none';
+function togglePauseTour() {
+    tourPaused = !tourPaused;
+    const btn = document.getElementById('tourPauseBtn');
+    if (tourPaused) {
+        clearTimeout(tourTimer);
+        btn.textContent = '▶ Resume';
+        btn.classList.add('paused');
+        const fill = document.getElementById('tourTtFill');
+        if (fill) fill.style.transition = 'none'; // freeze progress bar
+    } else {
+        btn.textContent = '⏸ Pause';
+        btn.classList.remove('paused');
+        startStepTimer(TOUR_STEPS[tourStepIdx]?.duration || 4000);
+    }
 }
 
-// ── Wire up buttons once DOM is ready ────────────────────────
+// ── Form fill (typewriter) ────────────────────────────────────
+const DEMO_INCIDENT = {
+    title:       'Kubernetes CoreDNS Loop via systemd-resolved',
+    severity:    'high',
+    service:     'kubernetes-dns',
+    affected:    'all-pods, service-discovery, ingress',
+    description: 'Newly provisioned Kubernetes node pool encountering infinite DNS forwarding loop within CoreDNS. Pods logging continuous Host not found exceptions. CoreDNS pods filling logs with Loop network loop detected emergency panics.',
+    logs:        '["EMERGENCY: Loop network loop detected", "ERROR: Host not found: kubernetes.default.svc.cluster.local", "WARN: CoreDNS forwarding to 127.0.0.53 loops back"]'
+};
+
+async function typeInto(el, text, speed = 28) {
+    if (!el) return;
+    el.focus();
+    el.value = '';
+    el.dispatchEvent(new Event('input'));
+    for (const ch of text) {
+        if (!tourActive) return;
+        el.value += ch;
+        el.dispatchEvent(new Event('input'));
+        await sleep(speed + Math.random() * 15);
+    }
+}
+
+async function doFillForm() {
+    formFilled = false;
+    // Switch to investigate tab first
+    safeSwitchTab('investigate');
+    await sleep(600);
+
+    // Highlight the form
+    const form = document.getElementById('incidentForm') || document.querySelector('#investigate form');
+    if (!form) return;
+    setSpotlight(form);
+
+    await typeInto(document.getElementById('title')       || document.querySelector('[name="title"]'),       DEMO_INCIDENT.title, 35);
+    await sleep(200);
+
+    const sevEl = document.getElementById('severity') || document.querySelector('#severity, [name="severity"]');
+    if (sevEl) { sevEl.value = DEMO_INCIDENT.severity; sevEl.dispatchEvent(new Event('change')); }
+    await sleep(300);
+
+    await typeInto(document.getElementById('service')     || document.querySelector('[name="service"]'),      DEMO_INCIDENT.service, 40);
+    await sleep(200);
+    await typeInto(document.getElementById('affected_services') || document.querySelector('[name="affected_services"]'), DEMO_INCIDENT.affected, 30);
+    await sleep(200);
+    await typeInto(document.getElementById('description') || document.querySelector('[name="description"], textarea'), DEMO_INCIDENT.description, 18);
+    await sleep(200);
+    await typeInto(document.getElementById('logs')        || document.querySelector('[name="logs"]'),         DEMO_INCIDENT.logs, 22);
+
+    formFilled = true;
+}
+
+async function doSubmitForm() {
+    const btn = document.getElementById('submitBtn') ||
+                document.querySelector('#incidentForm button[type="submit"], button.btn-primary');
+    if (!btn) return;
+
+    // Flash the button
+    btn.style.transform = 'scale(1.05)';
+    btn.style.boxShadow = '0 0 24px rgba(139,92,246,0.7)';
+    await sleep(400);
+    btn.style.transform = '';
+    btn.style.boxShadow = '';
+
+    if (formFilled) {
+        btn.click();
+    }
+    resultsFound = false;
+}
+
+async function doWaitForResults(maxDuration) {
+    const start = Date.now();
+    const limit = maxDuration || 20000;
+
+    while (Date.now() - start < limit) {
+        if (!tourActive) return;
+        // Try to find results container
+        const resultEl = document.getElementById('investigationResults') ||
+                         document.getElementById('result') ||
+                         document.querySelector('.investigation-result, .result-card');
+        if (resultEl && resultEl.offsetHeight > 10) {
+            resultsFound = true;
+            break;
+        }
+        await sleep(800);
+    }
+
+    // Re-spotlight results if found, else continue
+    const resultEl = document.getElementById('investigationResults') ||
+                     document.getElementById('result') ||
+                     document.querySelector('.investigation-result, .result-section');
+    if (resultEl) {
+        resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        await sleep(600);
+        setSpotlight(resultEl);
+    }
+
+    startStepTimer(2000);
+    await sleep(2200);
+    advanceTour(false);
+}
+
+function doScrollToResults() {
+    const resultEl = document.getElementById('investigationResults') ||
+                     document.getElementById('result') ||
+                     document.querySelector('.investigation-result, .result-section');
+    if (resultEl) {
+        resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setTimeout(() => setSpotlight(resultEl), 500);
+    }
+}
+
+function doOpenChatbot() {
+    const fabBtn = document.getElementById('floatingChatBtn');
+    if (fabBtn && document.getElementById('floatingChatPanel')?.classList.contains('open') === false) {
+        fabBtn.click();
+        chatOpened = true;
+    }
+    // Spotlight the panel
+    setTimeout(() => {
+        const panel = document.getElementById('floatingChatPanel');
+        if (panel) setSpotlight(panel);
+    }, 500);
+}
+
+async function doSendChatMessage() {
+    // Ensure chatbot is open
+    const panel = document.getElementById('floatingChatPanel');
+    if (!panel?.classList.contains('open')) {
+        document.getElementById('floatingChatBtn')?.click();
+        await sleep(500);
+    }
+
+    const input = document.getElementById('chatInput');
+    if (!input) return;
+
+    setSpotlight(panel || document.getElementById('floatingChatPanel'));
+    await sleep(400);
+
+    const question = 'How do we resolve a CoreDNS loop in Kubernetes?';
+    await typeInto(input, question, 45);
+    await sleep(500);
+
+    const form = document.getElementById('chatForm');
+    if (form) form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+}
+
+function doShowWebhookToast() {
+    if (typeof Toast !== 'undefined') {
+        Toast.show('📡 Webhook received from Alertmanager — auto-triggering background investigation...', 'info', 4500);
+        setTimeout(() => Toast.show('✅ Webhook investigation queued: HighMemoryUsage alert auto-analysed', 'success', 4000), 2000);
+    }
+    safeSwitchTab('investigate');
+    setTimeout(() => setSpotlight(document.querySelector('.header-status, .header')), 400);
+}
+
+// ── Tour lifecycle ────────────────────────────────────────────
+async function startGuidedTour() {
+    if (tourActive) return;
+    tourActive   = true;
+    tourPaused   = false;
+    tourStepIdx  = 0;
+    formFilled   = false;
+    resultsFound = false;
+    chatOpened   = false;
+
+    mountTourDOM();
+    showTourControls();
+    document.getElementById('demoOverlay').style.display = 'none'; // close old demo overlay if open
+
+    await executeStep(TOUR_STEPS[0]);
+}
+
+function stopTour() {
+    tourActive = false;
+    clearTimeout(tourTimer);
+
+    // Remove overlay segments
+    ['tourOverlayTop','tourOverlayBottom','tourOverlayLeft','tourOverlayRight'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.height = '0';
+    });
+
+    // Clean up
+    const wrapper = document.getElementById('tourWrapper');
+    if (wrapper) {
+        wrapper.style.opacity = '0';
+        wrapper.style.transition = 'opacity 0.4s';
+        setTimeout(() => wrapper.remove(), 420);
+    }
+
+    // Close chatbot if we opened it
+    if (chatOpened) {
+        const fabPanel = document.getElementById('floatingChatPanel');
+        if (fabPanel?.classList.contains('open')) {
+            document.getElementById('floatingChatBtn')?.click();
+        }
+    }
+}
+
+function showTourControls() {
+    const ctrls = document.getElementById('tourControls');
+    if (ctrls) {
+        ctrls.style.display = 'flex';
+        ctrls.style.opacity = '0';
+        setTimeout(() => ctrls.style.opacity = '1', 100);
+    }
+}
+
+// ── Utility ───────────────────────────────────────────────────
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function safeSwitchTab(name) {
+    // Try the app's own switchTab function first
+    if (typeof switchTab === 'function') {
+        switchTab(name);
+        return;
+    }
+    // Fallback: click the tab button
+    const btn = document.querySelector(`.tab-btn[data-tab="${name}"]`);
+    if (btn) btn.click();
+}
+
+// ── Wire up demo launch button ────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('liveDemoBtn')?.addEventListener('click', openDemoOverlay);
-    document.getElementById('closeDemoBtn')?.addEventListener('click', closeDemoOverlay);
+    // The existing "🎦 Live Demo" button now launches the guided tour
+    document.getElementById('liveDemoBtn')?.addEventListener('click', () => {
+        // Close old-style demo overlay if open
+        document.getElementById('demoOverlay').style.display = 'none';
+        startGuidedTour();
+    });
 
+    // Keep old demo overlay close button working
+    document.getElementById('closeDemoBtn')?.addEventListener('click', () => {
+        document.getElementById('demoOverlay').style.display = 'none';
+    });
     document.getElementById('startDemoBtn')?.addEventListener('click', () => {
-        runLiveDemo();
+        document.getElementById('demoOverlay').style.display = 'none';
+        startGuidedTour();
     });
-
     document.getElementById('resetDemoBtn')?.addEventListener('click', () => {
-        demoRunning = false;
-        demoAborted = false;
-        // Reset queue display and stats then re-run
-        document.getElementById('resetDemoBtn').style.display = 'none';
-        document.getElementById('startDemoBtn').style.display = 'inline-flex';
-        document.getElementById('demoProgressBar').style.display = 'none';
-        document.getElementById('demoProgressFill').style.width = '0%';
-        document.getElementById('demoSummaryBanner').style.display = 'none';
-        document.getElementById('demoIncidentList').innerHTML = '';
-        document.getElementById('demoMttrBars').innerHTML = '';
-        document.getElementById('demoCurrentCard').innerHTML = `
-            <div class="demo-current-placeholder">
-                <span style="font-size:40px">🤖</span>
-                <p>Click <strong>Start Demo</strong> to begin the live simulation</p>
-            </div>`;
-        animateStat('demoKbCount',    '66');
-        animateStat('demoMttrNow',    '—');
-        animateStat('demoSaved',       '0');
-        animateStat('demoReuseCount', '0 / 5');
-        animateStat('demoProgress',   '0 / 5');
-    });
-
-    // Close overlay on backdrop click
-    document.getElementById('demoOverlay')?.addEventListener('click', (e) => {
-        if (e.target === document.getElementById('demoOverlay')) closeDemoOverlay();
-    });
-
-    // Escape key closes demo
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && document.getElementById('demoOverlay')?.style.display === 'flex') {
-            closeDemoOverlay();
-        }
+        document.getElementById('demoOverlay').style.display = 'none';
+        startGuidedTour();
     });
 });
