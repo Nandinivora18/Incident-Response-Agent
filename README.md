@@ -312,9 +312,6 @@ curl -X POST http://localhost:8000/api/webhooks/alerts \
 ### Live System Dashboard View
 ![Dashboard View](screenshots/01-main-dashboard.png.jpeg)
 
-### Main Dashboard
-![Main Dashboard](screenshots/01-main-dashboard.png)
-
 ### Investigation Input Form
 ![Investigation Form](screenshots/02-investigate-form.png)
 
