@@ -25,6 +25,10 @@
                         <span class="status-dot"></span>
                         <span>System Status: <span id="system-status">Checking...</span></span>
                     </div>
+                    <button id="liveDemoBtn" class="demo-launch-btn">
+                        <span class="demo-live-dot"></span>
+                        🎦 Live Demo
+                    </button>
                 </div>
             </div>
         </header>
@@ -373,6 +377,101 @@
         <p>Running Automated Investigation phases...</p>
     </div>
 
+    <!-- ─── Live Demo Overlay ───────────────────────────────────────── -->
+    <div id="demoOverlay" class="demo-overlay" style="display:none" aria-modal="true" role="dialog">
+        <div class="demo-panel">
+
+            <!-- Demo Header -->
+            <div class="demo-hdr">
+                <div class="demo-hdr-left">
+                    <span class="demo-badge-live"><span class="demo-live-pulse"></span>LIVE</span>
+                    <div>
+                        <h2>🎦 Agent Learning Demo</h2>
+                        <p>Watch MTTR drop in real-time as the agent builds historical knowledge</p>
+                    </div>
+                </div>
+                <button id="closeDemoBtn" class="demo-close-btn" title="Close Demo">✕</button>
+            </div>
+
+            <!-- Demo Body -->
+            <div class="demo-body">
+
+                <!-- Left: Incident Queue -->
+                <div class="demo-queue">
+                    <h4>📥 Incident Queue</h4>
+                    <div id="demoIncidentList" class="demo-incident-list"></div>
+                    <div class="demo-queue-legend">
+                        <span class="dq-dot pending"></span> Pending
+                        <span class="dq-dot running"></span> Running
+                        <span class="dq-dot done"></span> Complete
+                    </div>
+                </div>
+
+                <!-- Center: Current Incident + Chart -->
+                <div class="demo-center">
+                    <div id="demoCurrentCard" class="demo-current-card">
+                        <div class="demo-current-placeholder">
+                            <span style="font-size:40px">🤖</span>
+                            <p>Click <strong>Start Demo</strong> to begin the live simulation</p>
+                        </div>
+                    </div>
+                    <div class="demo-chart-box">
+                        <div class="demo-chart-title">
+                            <span>📉 MTTR Learning Curve</span>
+                            <span class="demo-baseline-label">Baseline: 35 min</span>
+                        </div>
+                        <div id="demoMttrBars" class="demo-mttr-bars"></div>
+                    </div>
+                </div>
+
+                <!-- Right: Live Stats -->
+                <div class="demo-stats-panel">
+                    <div class="demo-stat-box">
+                        <div class="demo-stat-icon">📚</div>
+                        <div class="demo-stat-num" id="demoKbCount">66</div>
+                        <div class="demo-stat-lbl">KB Incidents</div>
+                    </div>
+                    <div class="demo-stat-box">
+                        <div class="demo-stat-icon">⏱️</div>
+                        <div class="demo-stat-num" id="demoMttrNow">—</div>
+                        <div class="demo-stat-lbl">Current MTTR</div>
+                    </div>
+                    <div class="demo-stat-box glow-green">
+                        <div class="demo-stat-icon">⚡</div>
+                        <div class="demo-stat-num" id="demoSaved">0</div>
+                        <div class="demo-stat-lbl">Minutes Saved</div>
+                    </div>
+                    <div class="demo-stat-box">
+                        <div class="demo-stat-icon">🧠</div>
+                        <div class="demo-stat-num" id="demoReuseCount">0 / 5</div>
+                        <div class="demo-stat-lbl">KB Matches</div>
+                    </div>
+                    <div class="demo-stat-box">
+                        <div class="demo-stat-icon">📊</div>
+                        <div class="demo-stat-num" id="demoProgress">0 / 5</div>
+                        <div class="demo-stat-lbl">Investigated</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Demo Footer -->
+            <div class="demo-footer">
+                <div id="demoSummaryBanner" class="demo-summary-banner" style="display:none">
+                    🏆 Demo Complete! The agent saved <strong id="demoFinalSaved">0</strong> min across 5 incidents — that's <strong id="demoFinalPct">0%</strong> MTTR reduction vs manual debugging.
+                </div>
+                <div class="demo-footer-actions">
+                    <button id="startDemoBtn" class="btn btn-primary demo-start-btn">▶️&nbsp; Start Demo</button>
+                    <button id="resetDemoBtn" class="btn btn-secondary" style="display:none">🔄 Restart</button>
+                    <div id="demoProgressBar" class="demo-progress-bar" style="display:none">
+                        <div id="demoProgressFill" class="demo-progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="demo.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
